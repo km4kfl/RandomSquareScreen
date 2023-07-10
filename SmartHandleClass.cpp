@@ -35,5 +35,5 @@ SmartGdiObjInner::SmartGdiObjInner() : hdc(NULL), handle(NULL) {
 // NOTE: The old object needs to be re-selected. The way I used this was I stored the old
 //		 object when I constructed this class/object and when it gets deconstructed it
 //		 reselects it which keeps me from forgetting to do it.
-SMARTHANDLECLASS_IMPL(SmartGdiObj, SmartGdiObjInner, SelectObject(h.hdc, h.handle)), SmartGdiObjInner(), (h.handle == NULL));
+SMARTHANDLECLASS_IMPL(SmartGdiObj, SmartGdiObjInner, SelectObject(h.hdc, h.handle), SmartGdiObjInner(), (h.handle == NULL));
 SMARTHANDLECLASS_IMPL(SmartBrush, HBRUSH, BOOL_THROW(DeleteObject(h)), NULL, (h == NULL));

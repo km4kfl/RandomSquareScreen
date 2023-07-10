@@ -195,6 +195,7 @@ static void UpdateScreen(HWND hwnd, HDC hdc, PAINTSTRUCT &ps) {
 
     int r2 = BitBlt(mem_hdc.GetHandle().hdc, 0, 0, width, height, hdc, 0, 0, SRCCOPY);
 
+    /*
     BITMAP bmp;
 
     BOOL_THROW(GetObject(hbm_win.GetHandle(), sizeof(bmp), &bmp) != 0);
@@ -231,16 +232,47 @@ static void UpdateScreen(HWND hwnd, HDC hdc, PAINTSTRUCT &ps) {
         (BITMAPINFO*)&bmp_hdr,
         DIB_RGB_COLORS
     );
+    */
 
     std::random_device rd;
     std::mt19937 g(rd());
 
+    float aw = 55;
+    float ah = 55;
+
+    for (int x = 0; x < 10; ++x) {
+        unsigned char rb = g() % 256;
+        unsigned char gb = g() % 256;
+        unsigned char bb = g() % 256;
+        SmartBrush scb0(CreateSolidBrush(RGB(rb, gb, bb)));
+        RECT _rect;
+        memset(&_rect, 0, sizeof(_rect));
+        _rect.top = g() % height;
+        _rect.left = g() % width;
+        _rect.right = _rect.left + (double)g() / (double)0xffffffff * aw;
+        _rect.bottom = _rect.top + (double)g() / (double)0xffffffff * ah;
+        FillRect(hdc, &_rect, scb0.GetHandle());
+    }
+
+    /*
     unsigned int _g_max = 0;
     _g_max--;
     double g_max = (double)_g_max;
 
     SIZE_T pixel_count = bmp_size / 4;
 
+    for (SIZE_T x = 0; x < pixel_count; ++x) {
+        unsigned char r = g() & 0xff;
+        unsigned char g = g() & 0xff;
+        unsigned char b = g() & 0xff;
+        p_data[x * 4 + 0] = r;
+        p_data[x * 4 + 1] = g;
+        p_data[x * 4 + 2] = b;
+        p_data[x * 4 + 3] = 0;
+    }
+    */
+
+    /*
     double r_alpha = (double)g() / g_max;
     double g_alpha = (double)g() / g_max;
     double b_alpha = (double)g() / g_max;
@@ -257,17 +289,15 @@ static void UpdateScreen(HWND hwnd, HDC hdc, PAINTSTRUCT &ps) {
         rnd_data_ri = rnd_data_ri * r_alpha + _rr * (1 - r_alpha);
         rnd_data_gi = rnd_data_gi * g_alpha + _rg * (1 - g_alpha);
         rnd_data_bi = rnd_data_bi * b_alpha + _rb * (1 - b_alpha);
-
-        float rand_float0 = rnd_data_ri;
-        float rand_float1 = rnd_data_gi;
-        float rand_float2 = rnd_data_bi;
         
-        p_data[x * 4 + 0] = (unsigned char)roundf(rand_float0 * 255);
-        p_data[x * 4 + 1] = (unsigned char)roundf(rand_float1 * 255);
-        p_data[x * 4 + 2] = (unsigned char)roundf(rand_float2 * 255);
+        p_data[x * 4 + 0] = (unsigned char)roundf(rnd_data_ri * 255);
+        p_data[x * 4 + 1] = (unsigned char)roundf(rnd_data_gi * 255);
+        p_data[x * 4 + 2] = (unsigned char)roundf(rnd_data_bi * 255);
         p_data[x * 4 + 3] = 0;
     }
+    */
 
+    /*
     SmartBitmap hbm_tmp(CreateCompatibleBitmap(
         mem_hdc.GetHandle().hdc,
         width,
@@ -283,7 +313,9 @@ static void UpdateScreen(HWND hwnd, HDC hdc, PAINTSTRUCT &ps) {
         (BITMAPINFO*)&bmp_hdr,
         DIB_RGB_COLORS
     );
+    */
 
+    /*
     h_data.Dealloc();
 
     SmartGdiObj sgdi1(SmartGdiObjInner(
@@ -292,11 +324,12 @@ static void UpdateScreen(HWND hwnd, HDC hdc, PAINTSTRUCT &ps) {
     ));
 
     int r4 = BitBlt(hdc, 0, 0, width, height, mem_hdc.GetHandle().hdc, 0, 0, SRCCOPY);
+    */
 
     // NOTE: These select the old objects when deconstructed as per the win32 API documentation.
-    sgdi0.Dealloc();
-    sgdi1.Dealloc();
-    h_data.Dealloc();
+    //sgdi0.Dealloc();
+    //sgdi1.Dealloc();
+    //h_data.Dealloc();
     mem_hdc.Dealloc();
     hbm_win.Dealloc();
 }
