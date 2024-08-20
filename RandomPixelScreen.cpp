@@ -27,8 +27,6 @@ BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
-static bool _g_preview_mode = false;
-
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
                      _In_ LPWSTR    lpCmdLine,
@@ -50,28 +48,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         return FALSE;
     }
 
-    {
-        std::string s = std::string((char*)lpCmdLine).substr(0, 2); /// first 2 letters from command line argument
-        if (s == "\\c" || s == "\\C" || s == "/c" || s == "/C" || s == "") {
-            //MessageBoxA(NULL, "There are no settings for this.", "Info", MB_OK);
-            //return 0;
-        }
-        else if (s == "\\s" || s == "\\S" || s == "/s" || s == "/S") {            
-            _g_preview_mode = false;
-        }
-        else if (s == "\\p" || s == "\\P" || s == "/p" || s == "/P") {
-            _g_preview_mode = true;
-
-            //HWND hwnd = (HWND)atoi(lpCmdLine + 3);
-            //return 0;
-        }
-    }
-
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_RANDOMPIXELSCREEN));
 
     MSG msg;
 
-    ShowCursor(FALSE);
+    ShowCursor(TRUE);
 
     // Main message loop:
     while (GetMessage(&msg, nullptr, 0, 0))
@@ -143,12 +124,16 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    DWORD style = WS_VISIBLE | WS_THICKFRAME | WS_POPUP;
    //style = WS_VISIBLE | WS_POPUP;
    style = WS_OVERLAPPEDWINDOW;
-   DWORD width = GetSystemMetrics(SM_CXMAXIMIZED);
-   DWORD height = GetSystemMetrics(SM_CYMAXIMIZED);
+   DWORD width = 300; //GetSystemMetrics(SM_CXMAXIMIZED);
+   DWORD height = 300; //GetSystemMetrics(SM_CYMAXIMIZED);
    //width = 200;
    //height = 200;
-   HWND hWnd = CreateWindowW(szWindowClass, szTitle, style,
-      0, 0, width, height, nullptr, nullptr, hInstance, nullptr);
+   HWND hWnd = CreateWindowW(
+      szWindowClass, szTitle, style,
+      0, 0, width, height,
+      nullptr, nullptr,
+      hInstance, nullptr
+   );
 
    if (!hWnd)
    {
@@ -158,7 +143,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
 
-   SetTimer(hWnd, 100, 12, (TIMERPROC)NULL);
+   SetTimer(hWnd, 100, 5000, (TIMERPROC)NULL);
    SetTimer(hWnd, 101, 1000, (TIMERPROC)NULL);
    return TRUE;
 }
@@ -195,7 +180,6 @@ static void UpdateScreen(HWND hwnd, HDC hdc, PAINTSTRUCT &ps) {
 
     int r2 = BitBlt(mem_hdc.GetHandle().hdc, 0, 0, width, height, hdc, 0, 0, SRCCOPY);
 
-    /*
     BITMAP bmp;
 
     BOOL_THROW(GetObject(hbm_win.GetHandle(), sizeof(bmp), &bmp) != 0);
@@ -232,15 +216,15 @@ static void UpdateScreen(HWND hwnd, HDC hdc, PAINTSTRUCT &ps) {
         (BITMAPINFO*)&bmp_hdr,
         DIB_RGB_COLORS
     );
-    */
 
     std::random_device rd;
     std::mt19937 g(rd());
 
+    /*
     float aw = 55;
     float ah = 55;
 
-    for (int x = 0; x < 10; ++x) {
+    for (int x = 0; x < 1; ++x) {
         unsigned char rb = g() % 256;
         unsigned char gb = g() % 256;
         unsigned char bb = g() % 256;
@@ -253,51 +237,22 @@ static void UpdateScreen(HWND hwnd, HDC hdc, PAINTSTRUCT &ps) {
         _rect.bottom = _rect.top + (double)g() / (double)0xffffffff * ah;
         FillRect(hdc, &_rect, scb0.GetHandle());
     }
+    */
 
-    /*
     unsigned int _g_max = 0;
-    _g_max--;
-    double g_max = (double)_g_max;
 
     SIZE_T pixel_count = bmp_size / 4;
-
-    for (SIZE_T x = 0; x < pixel_count; ++x) {
-        unsigned char r = g() & 0xff;
-        unsigned char g = g() & 0xff;
-        unsigned char b = g() & 0xff;
-        p_data[x * 4 + 0] = r;
-        p_data[x * 4 + 1] = g;
-        p_data[x * 4 + 2] = b;
-        p_data[x * 4 + 3] = 0;
-    }
-    */
-
-    /*
-    double r_alpha = (double)g() / g_max;
-    double g_alpha = (double)g() / g_max;
-    double b_alpha = (double)g() / g_max;
-
-    double rnd_data_ri = 0.0;
-    double rnd_data_gi = 0.0;
-    double rnd_data_bi = 0.0;
     
     for (SIZE_T x = 0; x < pixel_count; ++x) {
-        double _rr = (double)g() / g_max;
-        double _rg = (double)g() / g_max;
-        double _rb = (double)g() / g_max;
-
-        rnd_data_ri = rnd_data_ri * r_alpha + _rr * (1 - r_alpha);
-        rnd_data_gi = rnd_data_gi * g_alpha + _rg * (1 - g_alpha);
-        rnd_data_bi = rnd_data_bi * b_alpha + _rb * (1 - b_alpha);
-        
-        p_data[x * 4 + 0] = (unsigned char)roundf(rnd_data_ri * 255);
-        p_data[x * 4 + 1] = (unsigned char)roundf(rnd_data_gi * 255);
-        p_data[x * 4 + 2] = (unsigned char)roundf(rnd_data_bi * 255);
+        unsigned char cr = g() & 0xff;
+        unsigned char cg = g() & 0xff;
+        unsigned char cb = g() & 0xff;
+        p_data[x * 4 + 0] = cr;
+        p_data[x * 4 + 1] = cg;
+        p_data[x * 4 + 2] = cb;
         p_data[x * 4 + 3] = 0;
     }
-    */
 
-    /*
     SmartBitmap hbm_tmp(CreateCompatibleBitmap(
         mem_hdc.GetHandle().hdc,
         width,
@@ -313,9 +268,7 @@ static void UpdateScreen(HWND hwnd, HDC hdc, PAINTSTRUCT &ps) {
         (BITMAPINFO*)&bmp_hdr,
         DIB_RGB_COLORS
     );
-    */
 
-    /*
     h_data.Dealloc();
 
     SmartGdiObj sgdi1(SmartGdiObjInner(
@@ -324,12 +277,11 @@ static void UpdateScreen(HWND hwnd, HDC hdc, PAINTSTRUCT &ps) {
     ));
 
     int r4 = BitBlt(hdc, 0, 0, width, height, mem_hdc.GetHandle().hdc, 0, 0, SRCCOPY);
-    */
 
     // NOTE: These select the old objects when deconstructed as per the win32 API documentation.
-    //sgdi0.Dealloc();
-    //sgdi1.Dealloc();
-    //h_data.Dealloc();
+    sgdi0.Dealloc();
+    sgdi1.Dealloc();
+    h_data.Dealloc();
     mem_hdc.Dealloc();
     hbm_win.Dealloc();
 }
@@ -344,20 +296,6 @@ static void UpdateScreen(HWND hwnd, HDC hdc, PAINTSTRUCT &ps) {
 //  WM_DESTROY  - post a quit message and return
 //
 //
-
-class LastMousePos {
-public:
-    int x;
-    int y;
-    int i;
-
-    LastMousePos() : x(0), y(0), i(0) {
-
-    }
-};
-
-static LastMousePos _g_last_mouse_pos;
-
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
@@ -370,54 +308,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_TIMER:
     {
         switch (wParam) {
-        case 100:
-        {
-            InvalidateRect(hWnd, NULL, FALSE);
-            break;
-        }
-        case 101:
-        {
-#if MODE_SCREENSAVER == 1
-            LASTINPUTINFO lii;
-            memset(&lii, 0, sizeof(lii));
-
-            if (GetLastInputInfo(&lii) != 0) {
-                DWORD delta;
-                DWORD ctime = GetTickCount();
-
-                if (lii.dwTime > ctime) {
-                    DWORD tmp = 0;
-                    tmp--;
-                    delta = (tmp - lii.dwTime) + ctime;
-                } else {
-                    delta = ctime - lii.dwTime;
-                }
-
-                if (delta > (SCREENSAVER_TIMEOUT * 1000)) {
-                    ShowWindow(hWnd, 1);
-                }
-                else {
-                    ShowWindow(hWnd, 0);
-                }
+            case 100:
+            {
+                InvalidateRect(hWnd, NULL, FALSE);
+                break;
             }
-#endif
-#if MODE_FLIPFLOP == 1
-            if (_g_tick == 0) {
-                float rand_float = (float)std::rand() / (float)RAND_MAX;
-                _g_mode = (_g_mode + 1) % 2;
-                if (_g_mode) {
-                    _g_tick = (int)(rand_float * MAX_SECONDS_MODE0);
-                    ShowWindow(hWnd, 0);
-                }
-                else {
-                    _g_tick = (int)(rand_float * MAX_SECONDS_MODE1);
-                    ShowWindow(hWnd, 1);
-                }
+            case 101:
+            {
+                break;
             }
-            _g_tick--;
-#endif
-            break;
-        }
         }
     }
     case WM_COMMAND:
@@ -445,30 +344,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         EndPaint(hWnd, &ps);
     }
     break;
-    case WM_MOUSEMOVE:
-    {
-#if EXIT_ON_MOUSEMOVE == 1
-        int x_pos = GET_X_LPARAM(lParam);
-        int y_pos = GET_Y_LPARAM(lParam);
-
-        if (_g_last_mouse_pos.i > 0) {
-            float dx = x_pos - _g_last_mouse_pos.x;
-            float dy = y_pos - _g_last_mouse_pos.y;
-            float d = sqrtf(dx * dx + dy * dy);
-
-            if (d > 10.0f) {
-                ShowCursor(TRUE);
-                PostQuitMessage(0);
-            }
-        }
-
-        _g_last_mouse_pos.i = 1;
-
-        _g_last_mouse_pos.x = x_pos;
-        _g_last_mouse_pos.y = y_pos;
-#endif
-        break;
-    }
     case WM_DESTROY:
         PostQuitMessage(0);
         break;
