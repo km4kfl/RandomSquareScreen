@@ -160,6 +160,7 @@ static void UpdateScreen(HWND hwnd, HDC hdc, PAINTSTRUCT &ps) {
 
     std::random_device rd;
     std::mt19937 g(rd());
+    std::uniform_real_distribution<> dist(0.0, 1.0);
 
     for (int x = 0; x < 400; ++x) {
         unsigned char rb = g() % 256;
@@ -170,8 +171,8 @@ static void UpdateScreen(HWND hwnd, HDC hdc, PAINTSTRUCT &ps) {
         memset(&_rect, 0, sizeof(_rect));
         _rect.top = g() % height;
         _rect.left = g() % width;
-        double pr = (double)g() / (double)0xffffffff;
-        double pb = (double)g() / (double)0xffffffff;
+        float pr = (float)std::rand() / (float)RAND_MAX;
+        float pb = (float)std::rand() / (float)RAND_MAX;
         _rect.right = _rect.left + pr * aw;
         _rect.bottom = _rect.top + pb * ah;
         FillRect(hdc, &_rect, scb0.GetHandle());
