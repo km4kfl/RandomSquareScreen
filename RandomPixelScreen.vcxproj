@@ -24,6 +24,7 @@
     <ProjectGuid>{37b269d9-bc97-4f7e-bf41-44d7e255daca}</ProjectGuid>
     <RootNamespace>RandomPixelScreen</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>RandomSquareScreen</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -143,7 +144,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AppExceptions.cpp" />
-    <ClCompile Include="RandomPixelScreen.cpp" />
+    <ClCompile Include="RandomSquareScreen.cpp" />
     <ClCompile Include="SmartHandleClass.cpp" />
   </ItemGroup>
   <ItemGroup>

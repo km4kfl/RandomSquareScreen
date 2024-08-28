@@ -35,7 +35,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="RandomPixelScreen.cpp">
+    <ClCompile Include="RandomSquareScreen.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SmartHandleClass.cpp">
